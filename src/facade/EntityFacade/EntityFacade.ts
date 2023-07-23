@@ -9,10 +9,10 @@ import {IRoot} from '../../interfaces/IRoot'
  * Специальный фасад для сущности для выполнения различных операций.
  * Операции определяются отдельно от фасада.
  */
-export class EntityFacade {
+export class EntityFacade<E extends IEntity | IRootEntity = IEntity> {
 	public constructor(
 		protected readonly messageEmitter: IMessageEmitter,
-		protected readonly entity: IEntity | IRoot
+		public readonly entity: E
 	) {}
 }
 
