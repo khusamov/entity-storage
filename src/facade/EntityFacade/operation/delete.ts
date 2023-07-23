@@ -1,42 +1,43 @@
+import {isEntity} from '../../../functions/isEntity'
 import {IData} from '../../../interfaces/IData'
-import {IEntity} from '../../../interfaces/IEntity'
-import {parentNodeSymbol} from '../../../interfaces/INode'
+import {INode, parentNodeSymbol} from '../../../interfaces/INode'
 import {DataAfterDeletingMessage} from '../../../messages/DataAfterDeletingMessage'
 import {EntityFacade} from '../EntityFacade'
 
 declare module '../EntityFacade' {
 	interface EntityFacade {
 		/**
-		 * Удалить сущность или сущности.
+		 * Операция удаления сущностей и данных.
 		 */
-		delete(...entityArray: IEntity[]): void
+		delete(...nodeArray: INode[]): void
 	}
 }
 
 EntityFacade.prototype.delete = deleteOperation
 
-function deleteOperation(this: EntityFacade, ...entityArray: IEntity[]) {
+function deleteOperation(this: EntityFacade, ...nodeArray: INode[]) {
 	const messageEmitter = this.messageEmitter
 	const parentEntity = this.entity
 
-	for (const entity of entityArray) {
-		if (entity[parentNodeSymbol] !== parentEntity) {
+	for (const node of nodeArray) {
+		if (node[parentNodeSymbol] !== parentEntity) {
 			throw new Error('Не совпадают родительские узлы')
 		}
 
-		const parentNode = entity[parentNodeSymbol]
-
-		if (!parentNode) {
-			throw new Error('Не найден родительский узел')
-		}
-
-		// Удалить все данные сущности. Рекурсивно.
-		for (const data of parentEntity.flat(Infinity) as IData[]) {
-			parentEntity.splice(parentEntity.indexOf(data), 1)
-			messageEmitter.emit(new DataAfterDeletingMessage(data))
+		// Если данный узел является сущность,
+		// то следует удалить все данные этой сущности. Рекурсивно.
+		if (isEntity(node)) {
+			for (const data of node.flat(Infinity) as IData[]) {
+				const parentEntity = data[parentNodeSymbol]
+				if (parentEntity === null) {
+					throw new Error('Родительский узел должен быть определен')
+				}
+				parentEntity.splice(parentEntity.indexOf(data), 1)
+				messageEmitter.emit(new DataAfterDeletingMessage(data))
+			}
 		}
 
 		// Удалить сущность.
-		parentNode.splice(parentNode.indexOf(entity), 1)
+		parentEntity.splice(parentEntity.indexOf(node), 1)
 	}
 }

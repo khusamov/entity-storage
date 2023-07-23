@@ -1,29 +1,32 @@
+import {isEntity} from '../../../functions/isEntity'
 import {setParentRecursively} from '../../../functions/setParentRecursively'
 import {IData} from '../../../interfaces/IData'
-import {IEntity} from '../../../interfaces/IEntity'
+import {INode} from '../../../interfaces/INode'
 import {DataAfterPushingMessage} from '../../../messages/DataAfterPushingMessage'
 import {EntityFacade} from '../EntityFacade'
 
 declare module '../EntityFacade' {
 	interface EntityFacade {
 		/**
-		 * Добавить сущность или сущности.
+		 * Операция добавления сущностей и данных.
 		 */
-		push(...entityArray: IEntity[]): void
+		push(...nodeArray: INode[]): void
 	}
 }
 
 EntityFacade.prototype.push = pushOperation
 
-function pushOperation(this: EntityFacade, ...entityArray: IEntity[]) {
+function pushOperation(this: EntityFacade, ...nodeArray: INode[]) {
 	const messageEmitter = this.messageEmitter
 	const parentEntity = this.entity
 
-	for (const entity of entityArray) {
-		setParentRecursively(parentEntity, entity)
-		parentEntity.push(entity)
-		for (const data of entity.flat(Infinity) as IData[]) {
-			messageEmitter.emit(new DataAfterPushingMessage(data))
+	for (const node of nodeArray) {
+		setParentRecursively(parentEntity, node)
+		parentEntity.push(node)
+		if (isEntity(node)) {
+			for (const data of node.flat(Infinity) as IData[]) {
+				messageEmitter.emit(new DataAfterPushingMessage(data))
+			}
 		}
 	}
 }
