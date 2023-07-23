@@ -1,9 +1,6 @@
 import {IMessageEmitter} from 'khusamov-message-emitter'
 import {IEntity} from '../../interfaces/IEntity'
-import {IRoot} from '../../interfaces/IRoot'
-
-// export const messageEmitterSymbol = Symbol.for('messageEmitter')
-// export const entitySymbol = Symbol.for('entity')
+import {IRootEntity} from '../../interfaces/IRootEntity'
 
 /**
  * Специальный фасад для сущности для выполнения различных операций.
