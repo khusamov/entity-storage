@@ -3883,9 +3883,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"khusamov-message-broker@workspace:.":
+"khusamov-entity-storage@workspace:.":
   version: 0.0.0-use.local
-  resolution: "khusamov-message-broker@workspace:."
+  resolution: "khusamov-entity-storage@workspace:."
   dependencies:
     "@jest/globals": ^29.6.1
     "@parcel/packager-ts": 2.9.3
@@ -3893,17 +3893,17 @@ __metadata:
     "@types/jest": ^29.5.3
     events: ^3.3.0
     jest: ^29.6.1
-    khusamov-message-emitter: ^0.0.5
+    khusamov-message-emitter: ^0.0.6
     parcel: ^2.9.3
     ts-jest: ^29.1.1
     typescript: ^5.1.6
   languageName: unknown
   linkType: soft
 
-"khusamov-message-emitter@npm:^0.0.5":
-  version: 0.0.5
-  resolution: "khusamov-message-emitter@npm:0.0.5"
-  checksum: 635b8a21651576d0dd11634ee0564cbd3e30a9080161606506de3a43501cdb515807668fc26a03a1bdebfcb3d75750deb389bf8e46d3e2fc23f76820e23011ca
+"khusamov-message-emitter@npm:^0.0.6":
+  version: 0.0.6
+  resolution: "khusamov-message-emitter@npm:0.0.6"
+  checksum: f202ff00084d76a81f5770ef25f9647fb876959c113eed77e09e8281f1d09f0bff8da8d639ec8a279d516a9da2e5f0fa17032ce0f59781020fc6a9cde95105ed
   languageName: node
   linkType: hard
 

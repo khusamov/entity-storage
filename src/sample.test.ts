@@ -1,9 +1,7 @@
 import {EventEmitter} from 'events'
 import {IMessage, MessageEmitter} from 'khusamov-message-emitter'
 import {Data} from './classes/Data'
-import {Entity} from './classes/Entity'
-import {RootEntity} from './classes/RootEntity'
-import {RootFasade} from './facade/RootFasade'
+import {Entity} from './classes/Entity/Entity'
 
 
 describe('Sample', () => {
@@ -39,10 +37,9 @@ describe('Sample', () => {
 		class PositionData extends VectorData {}
 		class VelocityData extends VectorData {}
 
-		class WorldEntity extends RootEntity {}
+		class WorldEntity extends Entity {}
 
 		const worldEntity = new WorldEntity
-		const worldEntityFasade = new RootFasade(messageEmitter, worldEntity)
 
 
 		class AsteroidEntity extends Entity {
@@ -52,11 +49,10 @@ describe('Sample', () => {
 		}
 
 		const asteroidEntity = new AsteroidEntity
-		worldEntityFasade.push(asteroidEntity)
+		worldEntity.push(asteroidEntity)
 
-		const asteroidEntityFasade = worldEntityFasade.createEntityFasade(asteroidEntity)
 
-		worldEntityFasade.delete(asteroidEntityFasade.entity)
+		worldEntity.delete(asteroidEntity)
 
 	})
 

@@ -20,7 +20,7 @@
 		"test": "jest"
 	},
 	"dependencies": {
-		"khusamov-message-emitter": "^0.0.5"
+		"khusamov-message-emitter": "^0.0.6"
 	},
 	"devDependencies": {
 		"@jest/globals": "^29.6.1",
