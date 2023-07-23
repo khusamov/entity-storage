@@ -2,8 +2,8 @@ import {EventEmitter} from 'events'
 import {IMessage, MessageEmitter} from 'khusamov-message-emitter'
 import {Data} from './classes/Data'
 import {Entity} from './classes/Entity'
-import {EntityFacade} from './facade/EntityFacade'
-import {Root} from './classes/Root'
+import {RootEntity} from './classes/RootEntity'
+import {RootFasade} from './facade/RootFasade'
 
 
 describe('Sample', () => {
@@ -21,15 +21,42 @@ describe('Sample', () => {
 			emit(message)
 		}
 
+		class Vector {
+			public constructor(
+				public readonly x: number = 0,
+				public readonly y: number = 0
+			) {}
+		}
 
-		const root = new Root
-		const rootFasade = new EntityFacade(messageEmitter, root)
+		const nullVector: Vector = {x: 0, y: 0}
 
-		const entity1 = new Entity(new Data, new Data, new Data)
-		rootFasade.push(entity1)
+		class VectorData extends Data {
+			public constructor(public readonly value: Vector = nullVector) {
+				super()
+			}
+		}
 
-		console.log(root)
+		class PositionData extends VectorData {}
+		class VelocityData extends VectorData {}
 
+		class WorldEntity extends RootEntity {}
+
+		const worldEntity = new WorldEntity
+		const worldEntityFasade = new RootFasade(messageEmitter, worldEntity)
+
+
+		class AsteroidEntity extends Entity {
+			public constructor() {
+				super(new PositionData, new VelocityData)
+			}
+		}
+
+		const asteroidEntity = new AsteroidEntity
+		worldEntityFasade.push(asteroidEntity)
+
+		const asteroidEntityFasade = worldEntityFasade.createEntityFasade(asteroidEntity)
+
+		worldEntityFasade.delete(asteroidEntityFasade.entity)
 
 	})
 
