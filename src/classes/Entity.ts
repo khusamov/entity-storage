@@ -1,6 +1,6 @@
 import {IEntity} from '../interfaces/IEntity'
 import {INode, parentNodeSymbol} from '../interfaces/INode'
-import {IRoot} from '../interfaces/IRoot'
+import {IRootEntity} from '../interfaces/IRootEntity'
 
 /**
  * Базовая реализация сущности.
@@ -10,7 +10,7 @@ export class Entity extends Array<INode> implements IEntity {
 	 * Родительский узел сущности.
 	 * Если значение равно null, то сущность еще не добавили в хранилище.
 	 */
-	public [parentNodeSymbol]: IEntity | IRoot | null = null
+	public [parentNodeSymbol]: IEntity | IRootEntity | null = null
 
 	public constructor()
 	public constructor(arrayLength: number)

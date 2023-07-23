@@ -1,6 +1,6 @@
 import {INode, parentNodeSymbol} from './INode'
-import {IRoot} from './IRoot'
+import {IRootEntity} from './IRootEntity'
 
 export interface IEntity extends INode, Array<INode> {
-	[parentNodeSymbol]: IEntity | IRoot | null
+	[parentNodeSymbol]: IEntity | IRootEntity | null
 }

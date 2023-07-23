@@ -1,10 +1,10 @@
 import {INode, parentNodeSymbol} from '../interfaces/INode'
-import {IRoot} from '../interfaces/IRoot'
+import {IRootEntity} from '../interfaces/IRootEntity'
 
 /**
  * Базовая реализация корневой сущности.
  */
-export class Root extends Array<INode> implements IRoot {
+export class RootEntity extends Array<INode> implements IRootEntity {
 	/**
 	 * Родительский узел сущности.
 	 * Для корневой сущности всегда равен null.
