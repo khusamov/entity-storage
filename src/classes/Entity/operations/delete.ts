@@ -1,41 +1,52 @@
-import {Entity} from '../Entity'
-import {MessageEmitterData} from '../../../data/MessageEmitterData'
 import {NotFoundParentError} from '../../../errors/NotFoundParentError'
-import {deleteData} from '../../../functions/deleteData'
-import {getData} from '../../../functions/getData'
-import {getParent} from '../../../functions/getParent'
-import {getRootEntity} from '../../../functions/getRootEntity'
+import {NotFoundParentRelationshipError} from '../../../errors/NotFoundParentRelationshipError'
 import {isEntity} from '../../../functions/isEntity'
 import {IData} from '../../../interfaces/IData'
-import {INode, parentNodeSymbol} from '../../../interfaces/INode'
+import {IEntity} from '../../../interfaces/IEntity'
 import {DataAfterDeletingMessage} from '../../../messages/DataAfterDeletingMessage'
+import {SimpleArray} from '../../SimpleArray'
+import {Entity} from '../Entity'
+import {getMessageEmitter} from './push'
 
 declare module '../Entity' {
 	interface Entity {
 		/**
 		 * Операция удаления сущностей и данных.
 		 */
-		delete(...nodeArray: INode[]): void
+		delete(...nodeArray: Array<IEntity | IData>): void
 	}
 }
 
 Entity.prototype.delete = (
-	function deleteOperation(this: Entity, ...nodeArray: INode[]): void {
-		const rootEntity = getRootEntity(this)
-		const messageEmitter = getData(rootEntity, MessageEmitterData).messageEmitter
+	function deleteOperation(this: Entity, ...nodeArray: Array<IEntity | IData>): void {
 		const parentEntity = this
-		const splice = Array.prototype.splice.bind(this)
+		const rootEntity = parentEntity.rootEntity
+		const splice = SimpleArray.prototype.splice.bind(this)
+
+		// Если корневая сущность не определена, то удаляем без сообщений.
+		if (!rootEntity) {
+			for (const node of nodeArray) {
+				splice(parentEntity.indexOf(node), 1)
+			}
+			return
+		}
+
+		const messageEmitter = getMessageEmitter(this)
 
 		for (const node of nodeArray) {
-			if (node[parentNodeSymbol] !== parentEntity) {
-				throw new Error('Не совпадают родительские узлы')
+			if (node.parentEntity === null) {
+				throw new NotFoundParentError(node)
+			}
+			if (node.parentEntity !== parentEntity) {
+				throw new NotFoundParentRelationshipError(parentEntity, node.parentEntity)
 			}
 
-			// Если данный узел является сущность,
-			// то следует удалить все данные этой сущности. Рекурсивно.
+			// Если данный узел является сущностью,
+			// то следует сообщить об удалении всех данных этой сущности и дочерних.
 			if (isEntity(node)) {
-				for (const data of node.flat(Infinity) as IData[]) {
-					deleteData(data)
+				// @ts-ignore Игнорируем ошибку, связанную с тем, что node возможно бесконечный по глубине.
+				const deletedData = node.flat(Infinity) as IData[]
+				for (const data of deletedData) {
 					messageEmitter.emit(new DataAfterDeletingMessage(data))
 				}
 			}

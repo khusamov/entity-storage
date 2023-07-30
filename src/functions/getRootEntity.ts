@@ -1,11 +1,15 @@
-import {INode, rootNodeSymbol} from '../interfaces/INode'
-import {IRootEntity} from '../interfaces/IRootEntity'
+import {IEntity, rootEntitySymbol} from '../interfaces/IEntity'
 
-export function getRootEntity(node: INode): IRootEntity {
-	const rootNode = node[rootNodeSymbol]
-	if (!rootNode) {
-		// TODO в текст включить имя сущности
-		throw new Error('Не определен корневой узел')
+/**
+ * Получить ссылку на корневую сущность, предполагая что такая сущность точно существует.
+ * Если она не найдена, то генерируется ошибка.
+ * @param {IEntity} entity
+ * @returns {IEntity}
+ */
+export function getRootEntity<E extends IEntity>(entity: IEntity): E {
+	const rootEntity = entity.rootEntity
+	if (!rootEntity) {
+		throw new Error(`Не определена корневая сущность для '${entity.constructor.name}'`)
 	}
-	return rootNode
+	return rootEntity as E
 }

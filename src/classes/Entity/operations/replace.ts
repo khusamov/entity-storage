@@ -1,11 +1,9 @@
-import {Entity} from '../Entity'
-import {MessageEmitterData} from '../../../data/MessageEmitterData'
-import {deleteData} from '../../../functions/deleteData'
-import {getData} from '../../../functions/getData'
-import {getRootEntity} from '../../../functions/getRootEntity'
-import {setParentRecursively} from '../../../functions/setParentRecursively'
 import {IData} from '../../../interfaces/IData'
+import {parentEntitySymbol} from '../../../interfaces/IEntity'
 import {DataAfterReplacingMessage} from '../../../messages/DataAfterReplacingMessage'
+import {SimpleArray} from '../../SimpleArray'
+import {Entity} from '../Entity'
+import {getMessageEmitter} from './push'
 
 declare module '../Entity' {
 	interface Entity {
@@ -19,17 +17,24 @@ declare module '../Entity' {
 
 Entity.prototype.replace = (
 	function replaceOperation(this: Entity, previousData: IData, data: IData): void {
-		const rootEntity = getRootEntity(this)
-		const messageEmitter = getData(rootEntity, MessageEmitterData).messageEmitter
 		const parentEntity = this
-		const push = Array.prototype.push.bind(this)
+		const rootEntity = parentEntity.rootEntity
+		const push = SimpleArray.prototype.push.bind(this)
+		const splice = SimpleArray.prototype.splice.bind(this)
 
 		// Удалить предыдущие данные.
-		deleteData(previousData)
+		splice(parentEntity.indexOf(previousData), 1)
 
 		// Добавить новые данные.
-		setParentRecursively(parentEntity, data)
+		data[parentEntitySymbol] = parentEntity
 		push(data)
+
+		// Если корневая сущность не определена, то заменяем без сообщений.
+		if (!rootEntity) {
+			return
+		}
+
+		const messageEmitter = getMessageEmitter(this)
 
 		// Отправить сообщение о замене данных.
 		messageEmitter.emit(new DataAfterReplacingMessage(previousData, data))

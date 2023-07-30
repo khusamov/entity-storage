@@ -15,6 +15,7 @@
  */
 export class SimpleArray<T> extends Array<T> {
 	public constructor(...items: T[]) {
+		// Если среди items добавлен нуль, то пора переопределять еще один метод.
 		super(...items)
 	}
 
@@ -28,5 +29,28 @@ export class SimpleArray<T> extends Array<T> {
 	public override find(predicate: (value: T, index: number, obj: T[]) => unknown, thisArg?: any): T | undefined
 	public override find() {
 		return Array.from(this).find(arguments[0], arguments[1])
+	}
+
+	// public override splice(start: number, deleteCount?: number): T[]
+	// public override splice(start: number, deleteCount: number, ...items: T[]): T[] {
+	//
+	// 	// splice должен работать со своим массивом, а не с новым Array.from(this)
+	// 	// Но когда он работает со своим, то пользуется конструктором new <T>(arrayLength: number): T[];
+	// 	// Которого в SimpleArray нет. Потому и ошибка.
+	//
+	// 	return Array.from(this as Array<any>).splice(start, deleteCount, ...items)
+	// 	// return Array.prototype.splice.call(Array.from(this), start, deleteCount, ...items)
+	// }
+
+	public override flat<D extends number = 1>(depth?: D) {
+		return Array.from(this as Array<any>).flat(depth)
+	}
+
+	public override map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[] {
+		return Array.from(this).map(callbackfn, thisArg)
+	}
+
+	public override push(...items: T[]): number {
+		return Array.prototype.push.call(this, ...items)
 	}
 }

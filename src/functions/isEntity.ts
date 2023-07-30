@@ -1,6 +1,6 @@
+import {IData} from '../interfaces/IData'
 import {IEntity} from '../interfaces/IEntity'
-import {INode} from '../interfaces/INode'
 
-export function isEntity(node: INode): node is IEntity {
+export function isEntity(node: IEntity | IData): node is IEntity {
 	return Array.isArray(node)
 }
